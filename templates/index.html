@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Card Scanner</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h3 mb-0"><i class="bi bi-credit-card-2-front me-2"></i>Business Card Scanner</h1>
+                <a href="/export-csv" class="btn btn-light btn-sm">
+                    <i class="bi bi-download me-2"></i>Export CSV
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Main Content -->
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <!-- Scanner Section -->
+                <div class="card">
+        
+        <div class="row">
+            <div class="col-md-6">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">
+                            <i class="bi bi-camera me-2"></i>Scan Card
+                        </h5>
+                        <div class="d-flex gap-3 mb-4">
+                            <button id="openCamBtn" class="btn btn-primary">
+                                <i class="bi bi-camera-fill me-2"></i>Camera
+                            </button>
+                            <button id="uploadBtn" class="btn btn-outline-primary">
+                                <i class="bi bi-upload me-2"></i>Upload
+                            </button>
+                            <input type="file" id="fileInput" accept="image/*" style="display:none;">
+                        </div>
+                        <div class="capture-area">
+                            <video id="video" width="100%" autoplay style="display:none;"></video>
+                            <canvas id="canvas" width="100%" style="display:none;"></canvas>
+                            <img id="uploadedImg" src="" alt="Uploaded Image" style="display:none;" class="img-fluid">
+                            <div id="placeholder" class="text-center py-5">
+                                <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                                <p class="text-muted mt-3">No image captured yet</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Extracted Information -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">
+                            <i class="bi bi-file-text me-2"></i>Card Information
+                        </h5>
+                        <div id="textOutput">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <div class="field-label">Full Name</div>
+                                        <div id="nameField" class="field-value">-</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="field-label">Email</div>
+                                        <div id="emailField" class="field-value">-</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="field-label">Phone</div>
+                                        <div id="phoneField" class="field-value">-</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <div class="field-label">Company</div>
+                                        <div id="companyField" class="field-value">-</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="field-label">Designation</div>
+                                        <div id="designationField" class="field-value">-</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="field-label">Website</div>
+                                        <div id="websiteField" class="field-value">-</div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <div class="field-label">Address</div>
+                                        <div id="addressField" class="field-value">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scanned Cards History -->
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">
+                            <i class="bi bi-clock-history me-2"></i>Recent Scans
+                        </h5>
+                        <div id="cardsHistory">
+                            {% for card in cards %}
+                            <div class="history-card">
+                                <img src="{{ card.image_path }}" alt="Business Card">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">{{ card.full_name or 'Unnamed' }}</h6>
+                                    <p class="text-muted mb-1">{{ card.designation or 'No designation' }}</p>
+                                    <p class="mb-2"><strong>{{ card.company or 'No company' }}</strong></p>
+                                    <div class="d-flex gap-3">
+                                        <small class="text-primary">
+                                            <i class="bi bi-envelope me-1"></i>{{ card.email or 'No email' }}
+                                        </small>
+                                        <small class="text-primary">
+                                            <i class="bi bi-telephone me-1"></i>{{ card.phone or 'No phone' }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
