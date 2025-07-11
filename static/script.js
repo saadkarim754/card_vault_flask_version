@@ -89,26 +89,37 @@ function uploadImage(formData) {
             // Add the new card to the history without refreshing
             const cardsHistory = document.getElementById('cardsHistory');
             const newCard = document.createElement('div');
-            newCard.className = 'col-md-6 mb-4';
+            newCard.className = 'history-card';
             newCard.innerHTML = `
-                <div class="card">
-                    <div class="row g-0">
-                        <div class="col-md-4">
-                            <img src="${data.filepath}" class="img-fluid rounded-start" alt="Business Card">
-                        </div>
-                        <div class="col-md-8">
-                            <div class="card-body">
-                                <h5 class="card-title">${data.parsed_info.full_name || '-'}</h5>
-                                <p class="card-text">${data.parsed_info.designation || '-'}</p>
-                                <p class="card-text">${data.parsed_info.company || '-'}</p>
-                                <p class="card-text"><small>${data.parsed_info.email || '-'}</small></p>
-                                <p class="card-text"><small>${data.parsed_info.phone || '-'}</small></p>
-                            </div>
-                        </div>
+                <img src="${data.filepath}" alt="Business Card">
+                <div class="flex-grow-1">
+                    <h6 class="mb-1">${data.parsed_info.full_name || 'Unnamed'}</h6>
+                    <p class="text-muted mb-1">${data.parsed_info.designation || 'No designation'}</p>
+                    <p class="mb-2"><strong>${data.parsed_info.company || 'No company'}</strong></p>
+                    <div class="d-flex gap-3">
+                        <small class="text-primary">
+                            <i class="bi bi-envelope me-1"></i>${data.parsed_info.email || 'No email'}
+                        </small>
+                        <small class="text-primary">
+                            <i class="bi bi-telephone me-1"></i>${data.parsed_info.phone || 'No phone'}
+                        </small>
                     </div>
+                </div>
+                <div class="ms-auto">
+                    <button class="btn btn-outline-danger btn-sm delete-card-btn" data-card-id="${data.card_id || ''}">
+                        <i class="bi bi-trash"></i>
+                    </button>
                 </div>
             `;
             cardsHistory.insertBefore(newCard, cardsHistory.firstChild);
+            
+            // Add event listener to the new delete button
+            const newDeleteBtn = newCard.querySelector('.delete-card-btn');
+            if (newDeleteBtn) {
+                newDeleteBtn.addEventListener('click', function() {
+                    deleteCard(this.getAttribute('data-card-id'), newCard);
+                });
+            }
         } else {
             alert(data.error || 'An error occurred while processing the image');
         }
@@ -118,3 +129,43 @@ function uploadImage(formData) {
         alert('An error occurred while uploading the image');
     });
 }
+
+// Delete card function
+function deleteCard(cardId, cardElement) {
+    if (!cardId) {
+        alert('Cannot delete this card - no ID found');
+        return;
+    }
+    
+    if (confirm('Are you sure you want to delete this card?')) {
+        fetch(`/delete-card/${cardId}`, {
+            method: 'DELETE'
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                // Remove the card from the UI
+                cardElement.remove();
+                alert('Card deleted successfully');
+            } else {
+                alert(data.error || 'Failed to delete card');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while deleting the card');
+        });
+    }
+}
+
+// Add event listeners to existing delete buttons when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteButtons = document.querySelectorAll('.delete-card-btn');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const cardId = this.getAttribute('data-card-id');
+            const cardElement = this.closest('.history-card');
+            deleteCard(cardId, cardElement);
+        });
+    });
+});

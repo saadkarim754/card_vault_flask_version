@@ -109,6 +109,12 @@ body {
     border-radius: 10px;
     background: white;
     margin-bottom: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+}
+
+.history-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .history-card img {
@@ -117,6 +123,19 @@ body {
     object-fit: cover;
     border-radius: 8px;
     margin-right: 1rem;
+}
+
+.delete-card-btn {
+    border-radius: 8px;
+    padding: 0.4rem 0.6rem;
+    transition: all 0.2s ease;
+}
+
+.delete-card-btn:hover {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+    transform: scale(1.05);
 }
 
 /* Responsive Design */

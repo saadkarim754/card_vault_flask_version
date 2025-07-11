@@ -192,6 +192,7 @@ def upload():
             info['company'], info['designation'], info['address'], 
             info['website'], raw_text, cropped_filepath, datetime.now()
         ))
+        card_id = c.lastrowid  # Get the ID of the inserted card
         conn.commit()
         conn.close()
         
@@ -199,10 +200,40 @@ def upload():
             'success': True,
             'filepath': cropped_filepath,
             'text': raw_text,
-            'parsed_info': info
+            'parsed_info': info,
+            'card_id': card_id
         })
     
     return jsonify({'error': 'No business card detected'}), 400
+
+@app.route('/delete-card/<int:card_id>', methods=['DELETE'])
+def delete_card(card_id):
+    try:
+        conn = sqlite3.connect('business_cards.db')
+        c = conn.cursor()
+        
+        # Get the image path before deleting
+        c.execute("SELECT image_path FROM cards WHERE id = ?", (card_id,))
+        result = c.fetchone()
+        
+        if result:
+            image_path = result[0]
+            # Delete the image file if it exists
+            if os.path.exists(image_path):
+                os.remove(image_path)
+            
+            # Delete the card from database
+            c.execute("DELETE FROM cards WHERE id = ?", (card_id,))
+            conn.commit()
+            conn.close()
+            
+            return jsonify({'success': True, 'message': 'Card deleted successfully'})
+        else:
+            conn.close()
+            return jsonify({'error': 'Card not found'}), 404
+            
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/export-csv')
 def export_csv():
